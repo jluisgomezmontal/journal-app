@@ -1,7 +1,8 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import validator from 'validator';
+import { starRegister } from '../../actions/auth';
 import { removeError, setError } from '../../actions/ui';
 import { useForm } from '../../hooks/useForm';
 
@@ -10,7 +11,11 @@ export const RegisterScreen = () => {
 
     const dispatch = useDispatch();
 
+    const state = useSelector(state => state.ui );
 
+    const { msgError } = state;
+
+    console.log( msgError );
 
     const [ formValues, handleImputchange, reset ] = useForm({
         name: 'Luis',
@@ -26,7 +31,7 @@ export const RegisterScreen = () => {
     const handleRegister = (e) =>{
         e.preventDefault();
         if( isFormValid() ){
-            console.log('Formulario Valido')
+            dispatch( starRegister( email, password, name ) )
         }
     }
 
@@ -35,14 +40,14 @@ export const RegisterScreen = () => {
         
         
         if( name.trim().length === 0){
-            dispatch( setError('Nombre es requerido') )
+            dispatch( setError('Nombre es requerido') );
             return false;
         }else if( !validator.isEmail( email )){
-            dispatch( setError('Email es invalido') )
+            dispatch( setError('Email es invalido') );
             return false;
         }else if( password !== password2 || password.length < 5 ){
-            dispatch( setError('Password deberia de tener minimo 6 letras'))
-            return false
+            dispatch( setError('Password deberia de tener minimo 6 letras'));
+            return false;
         }
 
 
@@ -58,9 +63,14 @@ export const RegisterScreen = () => {
 
             <form onSubmit={ handleRegister }>
 
-                <div className="auth__alert-error">
-                    Rellene los datos!
-                </div>
+
+                {
+                    msgError &&
+                    <div className="auth__alert-error">
+                        { msgError }
+                    </div>
+
+                }
 
 
                 <input 
